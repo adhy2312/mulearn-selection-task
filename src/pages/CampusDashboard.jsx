@@ -3,12 +3,23 @@ import ExecomCard from "../components/ExecomCard";
 
 const CampusDashboard = () => {
   const [execom, setExecom] = useState([
-    { name: "Aaron S Varghese", role: "General Secretary", muid: "aaronsvarghese@mulearn" },
-    { name: "Adhithya Mohan", role: "Technical Lead", muid: "adhithyamohans@mulearn" },
+    {
+      name: "Aaron S Varghese",
+      role: "General Secretary",
+      muid: "aaronsvarghese@mulearn",
+    },
+    {
+      name: "Adhithya Mohan",
+      role: "Technical Lead",
+      muid: "adhithyamohans@mulearn",
+    },
   ]);
 
   const [form, setForm] = useState({ name: "", role: "", muid: "" });
   const [showReview, setShowReview] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const isFormValid = form.name && form.role && form.muid;
 
   const handleConfirmAdd = () => {
     setExecom([...execom, form]);
@@ -22,22 +33,44 @@ const CampusDashboard = () => {
     setExecom(updated);
   };
 
-  const handleUpdate = (indexToUpdate, updatedMember) => {
-    const updated = execom.map((m, index) =>
-      index === indexToUpdate ? updatedMember : m
+  const handleUpdate = (index, updatedMember) => {
+    const updated = execom.map((m, i) =>
+      i === index ? updatedMember : m
     );
     setExecom(updated);
   };
 
-  const isFormValid = form.name && form.role && form.muid;
+  const filteredExecom = execom.filter((member) =>
+    `${member.name} ${member.role} ${member.muid}`
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow">
+    <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-xl">
+      {/* Logo */}
+      <div className="flex justify-center mb-4">
+        <img
+          src="/mulearn-logo.png"
+          alt="µLearn Logo"
+          className="h-16 object-contain"
+        />
+      </div>
+
       <h1 className="text-3xl font-bold mb-6 text-center text-blue-700">
         Campus Execom Management
       </h1>
 
-      {/* Add Form */}
+      {/* Search */}
+      <input
+        type="text"
+        className="w-full p-2 mb-4 border rounded"
+        placeholder="Search members..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+
+      {/* Add Member Form */}
       <div className="grid sm:grid-cols-3 gap-4 mb-4">
         <input
           className="border p-2 rounded"
@@ -59,8 +92,8 @@ const CampusDashboard = () => {
         />
       </div>
       <button
-        disabled={!isFormValid}
         onClick={() => setShowReview(true)}
+        disabled={!isFormValid}
         className={`px-6 py-2 rounded ${
           isFormValid
             ? "bg-blue-600 text-white hover:bg-blue-700"
@@ -98,16 +131,20 @@ const CampusDashboard = () => {
         </div>
       )}
 
-      {/* Member List */}
-      <div className="mt-8 grid sm:grid-cols-2 gap-6">
-        {execom.map((member, index) => (
-          <ExecomCard
-            key={index}
-            member={member}
-            onRemove={() => handleRemove(index)}
-            onUpdate={(updatedMember) => handleUpdate(index, updatedMember)}
-          />
-        ))}
+      {/* Member Cards */}
+      <div className="mt-6 grid sm:grid-cols-2 gap-6">
+        {filteredExecom.length > 0 ? (
+          filteredExecom.map((member, index) => (
+            <ExecomCard
+              key={index}
+              member={member}
+              onRemove={() => handleRemove(index)}
+              onUpdate={(updated) => handleUpdate(index, updated)}
+            />
+          ))
+        ) : (
+          <p className="text-gray-500 text-center col-span-full">No matching members found.</p>
+        )}
       </div>
     </div>
   );
