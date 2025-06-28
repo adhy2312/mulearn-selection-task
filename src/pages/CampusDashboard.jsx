@@ -49,7 +49,7 @@ const CampusDashboard = () => {
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-xl">
       {/* Logo */}
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center mb-6">
         <img
           src="/mulearn-logo.png"
           alt="µLearn Logo"
@@ -64,44 +64,51 @@ const CampusDashboard = () => {
       {/* Search */}
       <input
         type="text"
-        className="w-full p-2 mb-4 border rounded"
+        className="w-full p-2 mb-6 border rounded"
         placeholder="Search members..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      {/* Add Member Form */}
-      <div className="grid sm:grid-cols-3 gap-4 mb-4">
-        <input
-          className="border p-2 rounded"
-          placeholder="Name"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-        />
-        <input
-          className="border p-2 rounded"
-          placeholder="Role"
-          value={form.role}
-          onChange={(e) => setForm({ ...form, role: e.target.value })}
-        />
-        <input
-          className="border p-2 rounded"
-          placeholder="MUID"
-          value={form.muid}
-          onChange={(e) => setForm({ ...form, muid: e.target.value })}
-        />
+      {/* Add Member Section in a Box */}
+      <div className="bg-gray-100 p-6 rounded-lg shadow-md mb-6">
+        <h2 className="text-xl font-semibold text-gray-700 mb-4">
+          Add New Member
+        </h2>
+
+        <div className="grid sm:grid-cols-3 gap-4 mb-4">
+          <input
+            className="border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+          />
+          <input
+            className="border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Role"
+            value={form.role}
+            onChange={(e) => setForm({ ...form, role: e.target.value })}
+          />
+          <input
+            className="border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="MUID"
+            value={form.muid}
+            onChange={(e) => setForm({ ...form, muid: e.target.value })}
+          />
+        </div>
+
+        <button
+          onClick={() => setShowReview(true)}
+          disabled={!isFormValid}
+          className={`px-6 py-2 rounded ${
+            isFormValid
+              ? "bg-blue-600 text-white hover:bg-blue-700"
+              : "bg-gray-300 text-gray-600 cursor-not-allowed"
+          }`}
+        >
+          Add Member
+        </button>
       </div>
-      <button
-        onClick={() => setShowReview(true)}
-        disabled={!isFormValid}
-        className={`px-6 py-2 rounded ${
-          isFormValid
-            ? "bg-blue-600 text-white hover:bg-blue-700"
-            : "bg-gray-300 text-gray-600 cursor-not-allowed"
-        }`}
-      >
-        Add Member
-      </button>
 
       {/* Review Modal */}
       {showReview && (
@@ -143,7 +150,9 @@ const CampusDashboard = () => {
             />
           ))
         ) : (
-          <p className="text-gray-500 text-center col-span-full">No matching members found.</p>
+          <p className="text-gray-500 text-center col-span-full">
+            No matching members found.
+          </p>
         )}
       </div>
     </div>
