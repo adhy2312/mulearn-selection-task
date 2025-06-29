@@ -1,158 +1,181 @@
-import React, { useState } from "react";
-import ExecomCard from "../components/ExecomCard";
+import React, { useState } from 'react';
+
 
 const CampusDashboard = () => {
   const [execom, setExecom] = useState([
-    {
-      name: "Aaron S Varghese",
-      role: "General Secretary",
-      muid: "aaronsvarghese@mulearn",
-    },
-    {
-      name: "Adhithya Mohan",
-      role: "Technical Lead",
-      muid: "adhithyamohans@mulearn",
-    },
+    { name: 'Aaron S Varghese', role: 'General Secretary', muid: 'aaronsvarghese@mulearn' },
+    { name: 'Adhithya Mohan', role: 'Technical Lead', muid: 'adhithyamohans@mulearn' }
   ]);
 
-  const [form, setForm] = useState({ name: "", role: "", muid: "" });
-  const [showReview, setShowReview] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const[newMember, setNewMember] = useState({ name: '', role: '', muid: '' });
+  const [searchQuery, setSearchQuery] = useState('');
+  const[editIndex, setEditIndex] = useState(null);
+  const[showReview, setShowReview] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState(null);
 
-  const isFormValid = form.name && form.role && form.muid;
+  const handleChange = (e) => {
+    setNewMember({ ...newMember, [e.target.name]: e.target.value });
+  };
 
-  const handleConfirmAdd = () => {
-    setExecom([...execom, form]);
-    setForm({ name: "", role: "", muid: "" });
+  const handleAddClick = () => {
+    if (newMember.name && newMember.role && newMember.muid) {
+      setShowReview(true);
+    }
+  };
+
+  const confirmAdd = () => {
+    if (editIndex !== null) {
+      const updated = [...execom];
+      updated[editIndex] = newMember;
+      setExecom(updated);
+      setEditIndex(null);
+    } else {
+      setExecom([...execom, newMember]);
+    }
+    setNewMember({ name: '', role: '', muid: '' });
     setShowReview(false);
   };
 
+  const cancelAdd = () => {
+    setShowReview(false);
+    setNewMember({ name: '', role: '', muid: '' });
+    setEditIndex(null);
+  };
+
+  const handleEdit = (index) => {
+    setNewMember(execom[index]);
+    setEditIndex(index);
+  };
+
   const handleRemove = (index) => {
-    const updated = [...execom];
-    updated.splice(index, 1);
-    setExecom(updated);
+    setMemberToRemove(index);
   };
 
-  const handleUpdate = (index, updatedMember) => {
-    const updated = execom.map((m, i) =>
-      i === index ? updatedMember : m
-    );
+  const confirmRemove = () => {
+    const updated = execom.filter((_, i) => i !== memberToRemove);
     setExecom(updated);
+    setMemberToRemove(null);
   };
 
-  const filteredExecom = execom.filter((member) =>
-    `${member.name} ${member.role} ${member.muid}`
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
+  const cancelRemove = () => {
+    setMemberToRemove(null);
+  };
+
+  const filteredExecom = execom.filter(member =>
+    member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    member.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    member.muid.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-xl">
-      {/* Logo */}
-      <div className="flex justify-center mb-6">
-        <img
-          src="/mulearn-logo.png"
-          alt="µLearn Logo"
-          className="h-16 object-contain"
-        />
-      </div>
-
-      <h1 className="text-3xl font-bold mb-6 text-center text-blue-700">
-        Campus Execom Management
-      </h1>
-
-      {/* Search */}
-      <input
-        type="text"
-        className="w-full p-2 mb-6 border rounded"
-        placeholder="Search members..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-
-      {/* Add Member Section in a Box */}
-      <div className="bg-gray-100 p-6 rounded-lg shadow-md mb-6">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">
-          Add New Member
-        </h2>
-
-        <div className="grid sm:grid-cols-3 gap-4 mb-4">
-          <input
-            className="border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Name"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-          />
-          <input
-            className="border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Role"
-            value={form.role}
-            onChange={(e) => setForm({ ...form, role: e.target.value })}
-          />
-          <input
-            className="border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="MUID"
-            value={form.muid}
-            onChange={(e) => setForm({ ...form, muid: e.target.value })}
-          />
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+      <div className="w-full max-w-7xl bg-white p-8 rounded-xl shadow-lg">
+        <div className="flex flex-col items-center mb-6">
+          <img src="/mulearn-logo.png" alt="μLearn Logo" className="h-12 mb-2" />
+          <h1 className="text-2xl md:text-3xl font-bold text-blue-700">Campus Execom Management</h1>
         </div>
 
-        <button
-          onClick={() => setShowReview(true)}
-          disabled={!isFormValid}
-          className={`px-6 py-2 rounded ${
-            isFormValid
-              ? "bg-blue-600 text-white hover:bg-blue-700"
-              : "bg-gray-300 text-gray-600 cursor-not-allowed"
-          }`}
-        >
-          Add Member
-        </button>
-      </div>
+        <input
+          type="text"
+          placeholder="Search members..."
+          className="w-full p-2 mb-6 border rounded-lg"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
 
-      {/* Review Modal */}
-      {showReview && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20">
-          <div className="bg-white p-6 rounded-xl shadow-xl text-center max-w-sm w-full">
-            <h2 className="text-lg font-bold mb-4">Review Member Details</h2>
-            <div className="text-left mb-6">
-              <p><strong>Name:</strong> {form.name}</p>
-              <p><strong>Role:</strong> {form.role}</p>
-              <p><strong>MUID:</strong> {form.muid}</p>
+        <div className="bg-gray-100 p-6 rounded-xl mb-6">
+          <h2 className="text-lg font-semibold mb-4">Add New Member</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <input
+              type="text"
+              name="name"
+              value={newMember.name}
+              onChange={handleChange}
+              placeholder="Name"
+              className="p-2 border rounded"
+            />
+            <input
+              type="text"
+              name="role"
+              value={newMember.role}
+              onChange={handleChange}
+              placeholder="Role"
+              className="p-2 border rounded"
+            />
+            <input
+              type="text"
+              name="muid"
+              value={newMember.muid}
+              onChange={handleChange}
+              placeholder="MUID"
+              className="p-2 border rounded"
+            />
+          </div>
+          <button
+            onClick={handleAddClick}
+            className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+          >
+            {editIndex !== null ? 'Update Member' : 'Add Member'}
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredExecom.map((member, index) => (
+            <div key={index} className="bg-gray-100 p-4 rounded-xl shadow-sm">
+              <h3 className="text-lg font-semibold">{member.name}</h3>
+              <p className="text-gray-600">{member.role}</p>
+              <p className="text-gray-500">{member.muid}</p>
+              <div className="mt-4 flex gap-2">
+                <button
+                  onClick={() => handleEdit(index)}
+                  className="bg-yellow-400 px-3 py-1 rounded text-white"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleRemove(index)}
+                  className="bg-red-500 px-3 py-1 rounded text-white"
+                >
+                  Remove
+                </button>
+              </div>
             </div>
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={handleConfirmAdd}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-              >
-                Confirm Add
-              </button>
-              <button
-                onClick={() => setShowReview(false)}
-                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
-              >
-                Cancel
-              </button>
+          ))}
+        </div>
+
+        {showReview && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-md text-center">
+              <h3 className="text-lg font-bold mb-4">Confirm Member Details</h3>
+              <p><strong>Name:</strong> {newMember.name}</p>
+              <p><strong>Role:</strong> {newMember.role}</p>
+              <p><strong>MUID:</strong> {newMember.muid}</p>
+              <div className="flex justify-center gap-4 mt-6">
+                <button onClick={confirmAdd} className="bg-green-500 px-4 py-2 rounded text-white">
+                  Confirm
+                </button>
+                <button onClick={cancelAdd} className="bg-gray-500 px-4 py-2 rounded text-white">
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Member Cards */}
-      <div className="mt-6 grid sm:grid-cols-2 gap-6">
-        {filteredExecom.length > 0 ? (
-          filteredExecom.map((member, index) => (
-            <ExecomCard
-              key={index}
-              member={member}
-              onRemove={() => handleRemove(index)}
-              onUpdate={(updated) => handleUpdate(index, updated)}
-            />
-          ))
-        ) : (
-          <p className="text-gray-500 text-center col-span-full">
-            No matching members found.
-          </p>
+        {memberToRemove !== null && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-md text-center">
+              <h3 className="text-lg font-bold mb-4">Are you sure you want to remove this member?</h3>
+              <div className="flex justify-center gap-4 mt-6">
+                <button onClick={confirmRemove} className="bg-red-500 px-4 py-2 rounded text-white">
+                  Yes, Remove
+                </button>
+                <button onClick={cancelRemove} className="bg-gray-500 px-4 py-2 rounded text-white">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
