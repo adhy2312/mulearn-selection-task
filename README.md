@@ -2,7 +2,7 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Descreption
+## Description
 
 This is a website created using react.js and Tailwind css , 
 The Basic functionalities are Add, remove, search or edit Campus Execom members
